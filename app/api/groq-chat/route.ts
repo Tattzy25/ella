@@ -2,16 +2,17 @@ import { NextRequest } from 'next/server';
 import { groqClient } from '@/lib/ai/groq-client';
 import { streamGroqChatCompletion } from '@/lib/ai/groq-stream';
 import type { GroqMessage } from '@/lib/ai/types';
+import { groqChatRequestSchema } from './schema';
 
 export const runtime = 'edge';
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { messages, model, stream, temperature, maxTokens, topP, stop } = body;
-
-  if (!Array.isArray(messages) || typeof model !== 'string') {
-    return new Response('Invalid request', { status: 400 });
+  const parseResult = groqChatRequestSchema.safeParse(body);
+  if (!parseResult.success) {
+    return new Response('Invalid request: ' + JSON.stringify(parseResult.error.format()), { status: 400 });
   }
+  const { messages, model, stream, temperature, maxTokens, topP, stop } = parseResult.data;
 
   if (stream) {
     const encoder = new TextEncoder();
