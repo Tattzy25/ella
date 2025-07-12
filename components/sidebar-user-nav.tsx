@@ -1,27 +1,53 @@
-'use client';
+"use client";
 
-import { ChevronUp } from 'lucide-react';
-import Image from 'next/image';
-import type { User } from 'next-auth';
-import { signOut, useSession } from 'next-auth/react';
-import { useTheme } from 'next-themes';
-
+import { ChevronUp } from "lucide-react";
+import { useTheme } from "next-themes";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { useRouter } from 'next/navigation';
-import { toast } from './toast';
-import { LoaderIcon } from './icons';
-import { guestRegex } from '@/lib/constants';
+} from "@/components/ui/sidebar";
+
+export function SidebarUserNav() {
+  const { setTheme, resolvedTheme } = useTheme();
+
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              data-testid="user-nav-button"
+              className="data-[state=open]:bg-sidebar-accent bg-background data-[state=open]:text-sidebar-accent-foreground h-10"
+            >
+              <span className="truncate">User</span>
+              <ChevronUp className="ml-auto" />
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            data-testid="user-nav-menu"
+            side="top"
+            className="w-[--radix-popper-anchor-width]"
+          >
+            <DropdownMenuItem
+              data-testid="user-nav-item-theme"
+              className="cursor-pointer"
+              onSelect={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            >
+              {`Toggle ${resolvedTheme === "light" ? "dark" : "light"} mode`}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+}
 
 export function SidebarUserNav({ user }: { user: User }) {
   const router = useRouter();
